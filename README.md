@@ -8,8 +8,8 @@ It will scrape the android apps data into CSV file based on search keyword input
 Requirements
 ============
 
- * [Python v2.7.x][1] (Python v3.x is not supported yet)
- * [Scrapy][2]
+ * Python v2.7.x
+ * Scrapy
 
 
 How to run
