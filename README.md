@@ -1,3 +1,5 @@
+### Note: this project isn't maintained anymore and most likely doesn't work anymore with the latest playstore.
+
 PlayStoreScrapy
 ===============
 
