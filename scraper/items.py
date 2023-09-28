@@ -8,8 +8,8 @@
 from datetime import datetime
 import re
 import scrapy
-from scrapy.contrib.loader import ItemLoader
-from scrapy.contrib.loader.processor import Join, MapCompose, Compose, TakeFirst
+from scrapy.loader import ItemLoader
+from scrapy.loader.processors import Join, MapCompose, Compose, TakeFirst
 from scraper.selector import Selector
 
 
@@ -18,19 +18,22 @@ class ParseDevLinks(object):
         self.text = text
 
     def __call__(self, response):
-        nodes = Selector(xpath=AppItem.APP_DEV_LINKS).get_element_list(response)
-        for node in nodes:
-            text = Selector.get_text(node).lower()
-            if self.text == "email" and self.text in text:
-                return Selector.get_attribute(node, "href").replace("mailto:", "").strip()
-            elif self.text == "website" and self.text in text:
-                return self.extract_url_from_google_url(Selector.get_attribute(node, "href"))
-            elif self.text == "privacy" and self.text in text:
-                return self.extract_url_from_google_url(Selector.get_attribute(node, "href"))
+        nodes = Selector(
+            xpath=AppItem.APP_DEV_LINKS).get_element_list(response)
+        if nodes != None:
+            for node in nodes:
+                text = Selector.get_text(node).lower()
+                if self.text == "email" and self.text in text:
+                    return Selector.get_attribute(node, "href").replace("mailto:", "").strip()
+                elif self.text == "website" and self.text in text:
+                    return self.extract_url_from_google_url(Selector.get_attribute(node, "href"))
+                elif self.text == "privacy" and self.text in text:
+                    return self.extract_url_from_google_url(Selector.get_attribute(node, "href"))
 
     @staticmethod
     def extract_url_from_google_url(url):
-        match = re.search(r"http[s]*://www\.google\.com/url\?q=(http[s]*://.+)&sa=.*", url)
+        match = re.search(
+            r"http[s]*://www\.google\.com/url\?q=(http[s]*://.+)&sa=.*", url)
         if match:
             return match.group(1)
         else:
@@ -38,10 +41,14 @@ class ParseDevLinks(object):
 
 
 class AppItemLoader(ItemLoader):
-    default_output_processor = Compose(TakeFirst(), lambda value: value.strip())
+    # default_output_processor = Compose(
+    #     # TakeFirst(),
+    #     lambda value: value.strip()
+    # )
 
     # override
     def load_item(self):
+
         for field_name, attr in self.item.fields.items():
             xpath = attr.get('xpath')
             css = attr.get('css')
@@ -54,7 +61,8 @@ class AppItemLoader(ItemLoader):
                 self.add_css(field_name, css)
 
             elif callback:
-                self.add_value(field_name, callback(self.context.get('response')))
+                self.add_value(field_name, callback(
+                    self.context.get('response')))
 
         return super(AppItemLoader, self).load_item()
 
@@ -63,7 +71,7 @@ class AppItem(scrapy.Item):
     APP_URL_PREFIX = 'https://play.google.com'
 
     # XPATH
-    APP_NAME = "//div[@class='info-container']/div[@class='document-title' and @itemprop='name']/div/text()"
+    APP_NAME = "//h1[@class='Fd93Bb F5UCq p5VxAd']/span/text()"
     APP_DEV = "//div[@class='info-container']/div[@itemprop='author']/a/span[@itemprop='name']/text()"
     APP_TOP_DEV = "//meta[@itemprop='topDeveloperBadgeUrl']/@content"
     APP_DEV_URL = "//div[@class='info-container']/div[@itemprop='author']/meta[@itemprop='url']/@content"
@@ -89,8 +97,10 @@ class AppItem(scrapy.Item):
     APP_DEV_LINKS = "//div[@class='content contains-text-link']/a[@class='dev-link']"
 
     # Fields
-    Url = scrapy.Field(callback=lambda response: response.url.replace("&hl=en", ""))
-    ScrapedDate = scrapy.Field(callback=lambda response: datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    Url = scrapy.Field(
+        callback=lambda response: response.url.replace("&hl=en", ""))
+    ScrapedDate = scrapy.Field(
+        callback=lambda response: datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     Name = scrapy.Field(xpath=APP_NAME)
     Developer = scrapy.Field(xpath=APP_DEV)
 
@@ -101,51 +111,52 @@ class AppItem(scrapy.Item):
 
     DeveloperURL = scrapy.Field(
         xpath=APP_DEV_URL,
-        output_processor=Compose(
-            TakeFirst(),
-            lambda value: AppItem.APP_URL_PREFIX + value if value else ""
-        )
+        # output_processor=Compose(
+        #     TakeFirst(),
+        #     lambda value: AppItem.APP_URL_PREFIX + value if value else ""
+        # )
     )
 
     PublicationDate = scrapy.Field(
         xpath=APP_PUBLISH_DATE,
-        output_processor=Compose(
-            TakeFirst(),
-            lambda value: str(datetime.strptime(value.replace(",", "").strip(), "%B %d %Y").date()) if value else ""
-        )
+        # output_processor=Compose(
+        #     TakeFirst(),
+        #     lambda value: str(datetime.strptime(value.replace(
+        #         ",", "").strip(), "%B %d %Y").date()) if value else ""
+        # )
     )
 
     Category = scrapy.Field(
         xpath=APP_CATEGORY,
-        output_processor=Compose(
-            TakeFirst(),
-            lambda value: value.split("/")[-1] if value else ""
-        )
+        # output_processor=Compose(
+        #     TakeFirst(),
+        #     lambda value: value.split("/")[-1] if value else ""
+        # )
     )
 
     IsFree = scrapy.Field(
         xpath=APP_PRICE,
-        output_processor=Compose(
-            TakeFirst(),
-            lambda value: "True" if value == "0" else "False"
-        )
+        # output_processor=Compose(
+        #     TakeFirst(),
+        #     lambda value: "True" if value == "0" else "False"
+        # )
     )
 
     Price = scrapy.Field(
         xpath=APP_PRICE,
-        output_processor=Compose(
-            TakeFirst(),
-            lambda value: "" if value == "0" else value
-        )
+        # output_processor=Compose(
+        #     TakeFirst(),
+        #     lambda value: "" if value == "0" else value
+        # )
     )
 
     CoverImageUrl = scrapy.Field(xpath=APP_COVER_IMG)
     Description = scrapy.Field(
         xpath=APP_DESCRIPTION,
-        output_processor=Compose(
-            Join('\n'),
-            lambda value: value.strip()
-        )
+        # output_processor=Compose(
+        #     Join('\n'),
+        #     lambda value: value.strip()
+        # )
     )
 
     ReviewScore = scrapy.Field(xpath=APP_SCORE_VALUE)

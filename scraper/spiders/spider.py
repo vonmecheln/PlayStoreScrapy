@@ -2,7 +2,7 @@
 
 import re
 import scrapy
-from scrapy import log
+import logging
 from scraper.items import AppItem, AppItemLoader
 from scraper.selector import Selector
 
@@ -13,7 +13,7 @@ class PlayStoreSpider(scrapy.Spider):
     start_urls = []
 
     CRAWL_URL = 'https://play.google.com/store/search?q={0}&c=apps'
-    APP_URLS = "//div[@class='details']/a[@class='card-click-target' and @tabindex='-1' and @aria-hidden='true']/@href"
+    APP_URLS = "//a[@class='Si6A0c Gy4nib']/@href"
 
     # count how many items have been scraped
     item_count = 0
@@ -44,12 +44,14 @@ class PlayStoreSpider(scrapy.Spider):
         try:
             self.max_item = int(max_item)
         except ValueError:
-            raise ValueError('"max_item" parameter is invalid: ' + str(max_item))
+            raise ValueError(
+                '"max_item" parameter is invalid: ' + str(max_item))
 
         try:
             self.download_delay = int(download_delay)
         except ValueError:
-            raise ValueError('"download_delay" parameter is invalid: ' + str(download_delay))
+            raise ValueError(
+                '"download_delay" parameter is invalid: ' + str(download_delay))
 
         if output:
             self.output_file = output.strip()
@@ -69,17 +71,20 @@ class PlayStoreSpider(scrapy.Spider):
 
     @staticmethod
     def show_help():
-        print '\n>>> Command Usage: scrapy crawl playstorescrapy -a keywords=<comma_separated_keywords> [options]'
-        print '>>> Options:'
-        print '>>>  -a max_item=<number>          Specify maximum number of scraped items (default=0)'
-        print '>>>  -a output=<filename>          Specify output filename path (default=item.csv)'
-        print '>>>  -a download_delay=<number>    Specify download delay in seconds (default=0)'
-        print '>>>  -a email=<email>              Specify login email'
-        print '>>>  -a "password=<password>"      Specify login password (note: the double-quotes is required)'
-        print ''
+        print('show_help-----------------------------------------------------------')
+        print(
+            '\n>>> Command Usage: scrapy crawl playstorescrapy -a keywords=<comma_separated_keywords> [options]')
+        print('>>> Options:')
+        print('>>>  -a max_item=<number>          Specify maximum number of scraped items (default=0)')
+        print('>>>  -a output=<filename>          Specify output filename path (default=item.csv)')
+        print('>>>  -a download_delay=<number>    Specify download delay in seconds (default=0)')
+        print('>>>  -a email=<email>              Specify login email')
+        print('>>>  -a "password=<password>"      Specify login password (note: the double-quotes is required)')
+        print('')
 
     # override
     def start_requests(self):
+        print('start_requests-----------------------------------------------------------')
         """
         If email is provided, go to login process first.
         If email is not provided, directly launch the scraping requests.
@@ -91,6 +96,7 @@ class PlayStoreSpider(scrapy.Spider):
             return self.launch_requests()
 
     def open_google(self):
+        print('open_google-----------------------------------------------------------')
         """
         Open google page to set up the cookie before login.
         """
@@ -99,12 +105,14 @@ class PlayStoreSpider(scrapy.Spider):
                                callback=self.login)]
 
     def login(self, response):
+        print('login-----------------------------------------------------------')
         """
         Login to google account.
         """
 
         galx = ''
-        match = re.search(r'<input\s+name="GALX"[\s\S]+?value="(.+?)">', response.body, flags=re.M)
+        match = re.search(
+            r'<input\s+name="GALX"[\s\S]+?value="(.+?)">', response.body, flags=re.M)
         if match:
             galx = match.group(1)
         return [
@@ -121,6 +129,7 @@ class PlayStoreSpider(scrapy.Spider):
         ]
 
     def is_login_success(self, response):
+        print('is_login_success-----------------------------------------------------------')
         """
         Check if login is success.
         :param response: Response object.
@@ -137,21 +146,23 @@ class PlayStoreSpider(scrapy.Spider):
             return False
 
     def after_login(self, response):
+        print('after_login-----------------------------------------------------------')
         """
         Check if login success or not.
         If success, continue to scrape the pages.
         """
 
         if self.is_login_success(response):
-            log.msg("**** Login success", level=log.INFO)
+            logging.info("**** Login success")
             self.email = None
             self.password = None
             return self.launch_requests()
         else:
-            log.msg("**** Login failed", level=log.WARNING)
+            logging.warning("**** Login failed")
             return
 
     def launch_requests(self):
+        print('launch_requests-----------------------------------------------------------')
         """
         Launch the scraping requests for each of keywords.
         """
@@ -170,34 +181,39 @@ class PlayStoreSpider(scrapy.Spider):
         return requests
 
     def parse_search_page(self, response):
+        print(
+            'parse_search_page-----------------------------------------------------------')
         """
         Parse search page.
         """
 
         if self.is_max_item_reached():
-            log.msg("**** Max Item reached", level=log.DEBUG)
+            logging.debug("**** Max Item reached")
             return
 
-        log.msg("**** Scraping: " + response.url, level=log.INFO)
+        logging.info("**** Scraping: " + response.url)
 
         app_urls = Selector(xpath=self.APP_URLS).get_value_list(response)
-        for url in app_urls:
-            # parse app detail page
-            yield scrapy.Request(AppItem.APP_URL_PREFIX + url + "&hl=en", callback=self.parse_app_url)
-        else:
-            # parse next stream data if exist
-            page_token = self.get_page_token(response.body)
-            if page_token is not None:
-                yield scrapy.FormRequest(
-                    response.url,
-                    formdata={
-                        'ipf': '1',
-                        'xhr': '1',
-                        'pagTok': page_token,
-                    },
-                    callback=self.parse_search_page)
+        if (app_urls != None):
+            for url in app_urls:
+                # parse app detail page
+                yield scrapy.Request(AppItem.APP_URL_PREFIX + url + "&hl=pt-br", callback=self.parse_app_url)
+            else:
+                # parse next stream data if exist
+                page_token = self.get_page_token(response.body)
+                if page_token is not None:
+                    yield scrapy.FormRequest(
+                        response.url,
+                        formdata={
+                            'ipf': '1',
+                            'xhr': '1',
+                            'pagTok': page_token,
+                        },
+                        callback=self.parse_search_page)
 
     def is_max_item_reached(self):
+        print(
+            'is_max_item_reached-----------------------------------------------------------')
         """
         Check if max_item has been reached.
         :return: True if max_item has been reached else False.
@@ -207,6 +223,7 @@ class PlayStoreSpider(scrapy.Spider):
 
     @staticmethod
     def get_page_token(content):
+        print('get_page_token-----------------------------------------------------------')
         """
         Get "pagTok" value from play store's search page.
         The token value will be used to fetch next stream data (see parse function).
@@ -215,34 +232,40 @@ class PlayStoreSpider(scrapy.Spider):
         :return: pagTok value or None if not found.
         """
 
-        match = re.search(r"'\[.*\\42((?:.(?!\\42))*:S:.*?)\\42.*\]\\n'", content)
+        return None
+        match = re.search(
+            r"'\[.*\\42((?:.(?!\\42))*:S:.*?)\\42.*\]\\n'", content)
         if match:
-            return match.group(1).replace('\\\\', '\\').decode('unicode-escape')
+            return bytes(match.group(1).replace('\\\\', '\\'), 'ascii').decode('unicode-escape')
         else:
             return None
 
     def parse_app_url(self, response):
+        print('parse_app_url-----------------------------------------------------------')
         """
         Parse App detail page.
         """
 
         if self.is_max_item_reached():
-            log.msg("**** Max Item reached", level=log.DEBUG)
+            logging.debug("**** Max Item reached")
             # Stop the crawling if max item reached
-            self.crawler.engine.close_spider(self, "Max Item reached")
+            if (self.crawler.engine != None):
+                self.crawler.engine.close_spider(self, "Max Item reached")
             return
 
         loader = AppItemLoader(item=AppItem(), response=response)
         yield loader.load_item()
 
         self.item_count += 1
-        log.msg("**** Item Count: " + str(self.item_count), level=log.INFO)
+        logging.info("**** Item Count: " + str(self.item_count))
 
     # override
     def parse(self, response):
+        print('parse-----------------------------------------------------------')
         pass
 
     # override
     def closed(self, reason):
-        log.msg("**** Spider has stopped. Reason: " + reason +
-                ". Total Scraped Items: " + str(self.item_count), level=log.INFO)
+        print('closed-----------------------------------------------------------')
+        logging.info("**** Spider has stopped. Reason: " + reason +
+                     ". Total Scraped Items: " + str(self.item_count))
