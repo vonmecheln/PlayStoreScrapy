@@ -71,21 +71,21 @@ class AppItem(scrapy.Item):
     APP_URL_PREFIX = 'https://play.google.com'
 
     # XPATH
-    APP_NAME = "//h1[@class='Fd93Bb F5UCq p5VxAd']/span/text()"
+    APP_NAME = "//h1[@class='Fd93Bb F5UCq p5VxAd']/span/text()" #PRONTO
     APP_DEV = "//div[@class='info-container']/div[@itemprop='author']/a/span[@itemprop='name']/text()"
     APP_TOP_DEV = "//meta[@itemprop='topDeveloperBadgeUrl']/@content"
     APP_DEV_URL = "//div[@class='info-container']/div[@itemprop='author']/meta[@itemprop='url']/@content"
-    APP_CATEGORY = "//div/a[@class='document-subtitle category']/@href"
+    APP_CATEGORY = "//div[@class='VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-INsAgc VfPpkd-LgbsSe-OWXEXe-dgl2Hf Rj2Mlf OLiIxf PDpWxe P62QJc LQeN7 LMoCf']/span[@class='VfPpkd-vQzf8d']/text()" #PRONTO
     APP_PRICE = "//span[@itemprop='offers' and @itemtype='http://schema.org/Offer']/meta[@itemprop='price']/@content"
     APP_COVER_IMG = "//div[@class='details-info']/div[@class='cover-container']/img[@class='cover-image']/@src"
     APP_DESCRIPTION = "//div[@class='show-more-content text-body' and @itemprop='description']//text()"
     APP_SCORE_VALUE = "//div[@class='rating-box']/div[@class='score-container']/meta[@itemprop='ratingValue']/@content"
     APP_SCORE_COUNT = "//div[@class='rating-box']/div[@class='score-container']/meta[@itemprop='ratingCount']/@content"
-    APP_FIVE_STARS = "//div[@class='rating-histogram']/div[@class='rating-bar-container five']/span[@class='bar-number']/text()"
-    APP_FOUR_STARS = "//div[@class='rating-histogram']/div[@class='rating-bar-container four']/span[@class='bar-number']/text()"
-    APP_THREE_STARS = "//div[@class='rating-histogram']/div[@class='rating-bar-container three']/span[@class='bar-number']/text()"
-    APP_TWO_STARS = "//div[@class='rating-histogram']/div[@class='rating-bar-container two']/span[@class='bar-number']/text()"
-    APP_ONE_STARS = "//div[@class='rating-histogram']/div[@class='rating-bar-container one']/span[@class='bar-number']/text()"
+    APP_FIVE_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[1]" #PRONTO
+    APP_FOUR_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[2]" #PRONTO
+    APP_THREE_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[3]" #PRONTO
+    APP_TWO_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[4]" #PRONTO
+    APP_ONE_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[5]" #PRONTO
     APP_PUBLISH_DATE = "//div[@class='meta-info']/div[@itemprop='datePublished']/text()"
     APP_SIZE = "//div[@class='meta-info']/div[@itemprop='fileSize']/text()"
     APP_INSTALLS = "//div[@class='content' and @itemprop='numDownloads']/text()"
