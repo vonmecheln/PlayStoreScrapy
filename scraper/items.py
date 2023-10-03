@@ -72,15 +72,15 @@ class AppItem(scrapy.Item):
 
     # XPATH
     APP_NAME = "//h1[@class='Fd93Bb F5UCq p5VxAd']/span/text()" #PRONTO
-    APP_DEV = "//div[@class='info-container']/div[@itemprop='author']/a/span[@itemprop='name']/text()"
+    APP_DEV = "(//div[@class='reAt0']/text())[7]" #PRONTO
     APP_TOP_DEV = "//meta[@itemprop='topDeveloperBadgeUrl']/@content"
     APP_DEV_URL = "//div[@class='info-container']/div[@itemprop='author']/meta[@itemprop='url']/@content"
     APP_CATEGORY = "//div[@class='VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-INsAgc VfPpkd-LgbsSe-OWXEXe-dgl2Hf Rj2Mlf OLiIxf PDpWxe P62QJc LQeN7 LMoCf']/span[@class='VfPpkd-vQzf8d']/text()" #PRONTO
     APP_PRICE = "//span[@itemprop='offers' and @itemtype='http://schema.org/Offer']/meta[@itemprop='price']/@content"
-    APP_COVER_IMG = "//div[@class='details-info']/div[@class='cover-container']/img[@class='cover-image']/@src"
-    APP_DESCRIPTION = "//div[@class='show-more-content text-body' and @itemprop='description']//text()"
-    APP_SCORE_VALUE = "//div[@class='rating-box']/div[@class='score-container']/meta[@itemprop='ratingValue']/@content"
-    APP_SCORE_COUNT = "//div[@class='rating-box']/div[@class='score-container']/meta[@itemprop='ratingCount']/@content"
+    APP_COVER_IMG = "//img[@class='oiEt0d']/@src" #PRONTO
+    APP_DESCRIPTION = "(//div[@class='SfzRHd']/div[@data-g-id='description']/text())[1]" #PRONTO
+    APP_SCORE_VALUE = "//div[@class='TT9eCd']/text()" #PRONTO
+    APP_SCORE_COUNT = "//div[@class='EHUI5b']/text()" #PRONTO
     APP_FIVE_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[1]" #PRONTO
     APP_FOUR_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[2]" #PRONTO
     APP_THREE_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[3]" #PRONTO
@@ -88,12 +88,12 @@ class AppItem(scrapy.Item):
     APP_ONE_STARS = "(//div[@class='JzwBgb']/div[@class='RJfYGf']/div[@class='RutFAf wcB8se']/@title)[5]" #PRONTO
     APP_PUBLISH_DATE = "//div[@class='meta-info']/div[@itemprop='datePublished']/text()"
     APP_SIZE = "//div[@class='meta-info']/div[@itemprop='fileSize']/text()"
-    APP_INSTALLS = "//div[@class='content' and @itemprop='numDownloads']/text()"
-    APP_VERSION = "//div[@class='content' and @itemprop='softwareVersion']/text()"
+    APP_INSTALLS = "//div[@class='ClM7O']/text()" #PRONTO
+    APP_VERSION = "(//div[@class='reAt0']/text)[1]" #PRONTO
     APP_OS_REQUIRED = "//div[@class='content' and @itemprop='operatingSystems']/text()"
     APP_CONTENT_RATING = "//div[@class='content' and @itemprop='contentRating']/text()"
     APP_IAP_MESSAGE = "//div[@class='info-container']/div[@class='inapp-msg']/text()"
-    APP_IAP_PRICE = "//div[@class='details-section-contents']//div[@class='meta-info'][div[@class='title']/text()[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'in-app')]]/div[@class='content']/text()"
+    APP_IAP_PRICE = "(//div[@class='reAt0']/text())[5]" #PRONTO
     APP_DEV_LINKS = "//div[@class='content contains-text-link']/a[@class='dev-link']"
 
     # Fields
